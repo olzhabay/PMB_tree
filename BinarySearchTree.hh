@@ -10,8 +10,6 @@ class BinarySearchTree {
         Node *parent;
         Node *left;
         Node *right;
-    };
-    struct LeafNode : Node {
         int16_t idx;
     };
 
@@ -22,5 +20,6 @@ public:
     int16_t search(int64_t key);
     void insert(int64_t key, int16_t idx);
     void remove(int64_t key);
-    void create(int64_t keys, int16_t idxs);
+    void create(int64_t &keys[], int16_t size);
+    void create(Node *node, int64_t &keys[], int16_t from, int16_t to);
 };
