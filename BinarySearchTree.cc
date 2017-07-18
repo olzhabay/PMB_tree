@@ -111,7 +111,6 @@ void BinarySearchTree::remove(int64_t key) {
 // construct tree from given sorted array of keys
 void BinarySearchTree::create(int64_t &keys[], int16_t size) {
     root = new Node;
-    this->size = size;
     create(root, keys, 0, size-1);
 }
 
@@ -127,4 +126,16 @@ void BinarySearchTree::create(Node *node, int64_t &keys[], int16_t from, int16_t
         node->left = node->right = nullptr;
         node->idx = mid_id;
     }
+}
+
+int16_t BinarySearchTree::getNext(int64_t key) {
+    return 0;
+}
+
+int16_t BinarySearchTree::getPrev(int64_t key) {
+    return 0;
+}
+
+int16_t BinarySearchTree::getSmallest() {
+    return 0;
 }

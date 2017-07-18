@@ -14,7 +14,6 @@ class BinarySearchTree {
     };
 
     Node *root;
-    int16_t size;
 public:
     BinarySearchTree();
     int16_t search(int64_t key);
@@ -22,4 +21,7 @@ public:
     void remove(int64_t key);
     void create(int64_t &keys[], int16_t size);
     void create(Node *node, int64_t &keys[], int16_t from, int16_t to);
+    int16_t getNext(int64_t key);
+    int16_t getPrev(int64_t key);
+    int16_t getSmallest();
 };
