@@ -17,14 +17,22 @@ TreeNode::TreeNode(void *parent, void *next) {
     level = 0;
 }
 
+ void TreeNode::copyData(Data &*tocopy, int16_t from, int16_t to) {
+     this->next = next;
+     for (int16_t i = from; i <= to; i++) {
+         data[i] = tocopy[i];
+     }
+     bst->create(data, size);
+}
+
 void TreeNode::insert(int64_t key, void *ptr) {
-    this->key[tsize] = key;
-    this->ptr[tsize] = ptr;
+    this->data[tsize].key = key;
+    this->data[tsize].ptr = ptr;
+    this->data[tsize].valid = true;
 #ifdef FLUSH
-    clflush((char*)key[tsize], sizeof(int64_t));
-    clflush((char*)ptr[tsize], sizeof(int64_t));
+    clflush((char*)&data[tsize], sizeof(Data));
 #endif
-    bst.insert(key, tsize);
+    bst->insert(key, tsize);
     tsize++;
     size++;
 #ifdef FLUSH
@@ -33,7 +41,7 @@ void TreeNode::insert(int64_t key, void *ptr) {
 }
 
 void TreeNode::remove(int64_t key) {
-    bst.remove(key);
+    data[bst->remove(key)].valid = false;
     size--;
 #ifdef FLUSH
     clflush((char*)size, sizeof(int16_t));
@@ -41,7 +49,7 @@ void TreeNode::remove(int64_t key) {
 }
 
 void *TreeNode::getPtr(int64_t key) {
-    return ptr[bst.search(key)];
+    return data[bst->search(key)].ptr;
 }
 
 void *TreeNode::getNext() {
@@ -54,6 +62,10 @@ void *TreeNode::getParent() {
 
 int16_t TreeNode::getSize() {
     return size;
+}
+
+int16_t TreeNode::getTotalSize() {
+    return tsize;
 }
 
 int16_t TreeNode::getLevel() {
@@ -69,13 +81,55 @@ bool TreeNode::isFull() {
 }
 
 int64_t TreeNode::getKey() {
-    return key[bst.getSmallest()];
+    return data[bst->getSmallest()].key;
 }
 
-void *TreeNode::getNext(int64_t key) {
-    return ptr[bst.getNext(key)];
+void *TreeNode::getNeighbor(int64_t key) {
+    return data[bst->getNeighbor(key)].ptr;
+}
+
+TreeNode::Data TreeNode::getData(int16_t idx) {
+    return data[idx];
 }
 
 void *TreeNode::getPrev(int64_t key) {
-    return ptr[bst.getPrev(key)];
+    int prev_idx = bst->getPrev(key);
+    return prev_idx == -1 ? nullptr : data[prev_idx].ptr;
+}
+
+void *TreeNode::getNext(int64_t key) {
+    int next_idx = bst->getNext(key);
+    return next_idx == -1 ? nullptr : data[next_idx].ptr;
+}
+
+void TreeNode::setNext(void *next) {
+    this->next = next;
+#ifdef FLUSH
+    clflush((char*) this->next, sizeof(void*));
+#endif
+}
+
+
+void TreeNode::replaceFirst(int64_t key, int64_t new_key, void *ptr) {
+    BinarySearchTree::Node *node = bst->searchLeaf(key);
+    int16_t idx = node->idx;
+    data[idx].ptr = ptr;
+    data[idx].key = new_key;
+#ifdef FLUSH
+    clflush((char*) data[idx].ptr, sizeof(void*));
+    clflush((char*) data[idx].key, sizeof(int64_t));
+#endif
+}
+
+// TODO
+void TreeNode::defragmentation() {
+
+}
+
+void *TreeNode::first() {
+    return size > 0 ? data[bst->getSmallest()].ptr : nullptr;
+}
+
+void *TreeNode::last() {
+    return size > 0 ? data[bst->getBiggest()].ptr : nullptr;
 }
